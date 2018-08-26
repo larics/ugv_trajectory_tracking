@@ -1,0 +1,42 @@
+<launch>
+  <arg name="namespace"  default="gvrbot"/>
+  <arg name="simulation" default="false"/>
+  <arg name="controller_rate" default="10"/>
+  <arg name="trajectory_rate" default="100"/>
+
+
+  <node pkg="joy" type="joy_node" name="joy_node">
+    <param name="autorepeat_rate" type="int" value="20" />
+    <param name="deadzone" type="double" value="0.12"/>
+    <param name="dev" type="string" value="/dev/input/js0"/>
+  </node>
+
+  <group ns="$(arg namespace)" >
+    <node pkg="ugv_trajectory_tracking" type="gvr_bot_control.py" name="gvr_bot_control" output="screen">
+      <param name="rate" type="int" value="$(arg controller_rate)" />
+      <param name="sim" type="bool" value="$(arg simulation)" />
+      <param name="Kp_v" type="double" value="0.5" />
+      <param name="Kp_w" type="double" value="1.25" />
+      <param name="v_limit" type="double" value="0.5" />
+      <param name="w_limit" type="double" value="2.5" />
+      <param name="sensitivity" type="double" value="0.05" />
+
+      <remap from="pose" to="/vrpn_client_node/gvrbot/pose"/>
+      <remap from="gazebo/model_states" to="/gazebo/model_states"/>
+      <remap from="computed_control_actions" to="/cmd_vel"/>
+    </node>
+
+    <node pkg="ugv_trajectory_tracking" type="gvr_bot_commander.py" name="gvr_bot_commander" output="screen">
+      <param name="rate" type="int" value="$(arg controller_rate)" />
+      <param name="trajectory_rate" type="int" value="$(arg trajectory_rate)" />
+      <param name="sim" type="bool" value="$(arg simulation)" />
+      <param name="carrot_w" type="double" value="0.001" />
+      <param name="carrot_v" type="double" value="1.0" />
+
+      <remap from="gazebo/model_states" to="/gazebo/model_states"/>
+      <remap from="pose" to="/vrpn_client_node/gvrbot/pose"/>
+      <remap from="joy" to="/joy"/>
+    </node>
+  </group>
+
+</launch>
