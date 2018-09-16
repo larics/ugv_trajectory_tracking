@@ -26,8 +26,8 @@ roslaunch ugv_trajectory_tracking gvr_bot.launch
 
 This node provides position control for an UGV. It has 2 control types:
 
-* `0` - the velocities from `/cmd_vel_ref` topic are just forwarded to output. Mode without position control.
-* `1` - position control mode.  
+* `0` MANUAL - the velocities from `/cmd_vel_ref` topic are just forwarded to output. Mode without position control.
+* `1` POSITION CONTROL - position control mode.  
 
 **Subscriptions:**
 
