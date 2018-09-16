@@ -12,7 +12,7 @@
   </node>
 
   <group ns="$(arg namespace)" >
-    <node pkg="ugv_trajectory_tracking" type="gvr_bot_control.py" name="gvr_bot_control" output="screen">
+    <node pkg="ugv_trajectory_tracking" type="ugv_control.py" name="ugv_control" output="screen">
       <param name="rate" type="int" value="$(arg controller_rate)" />
       <param name="sim" type="bool" value="$(arg simulation)" />
       <param name="Kp_v" type="double" value="0.5" />
@@ -26,7 +26,7 @@
       <remap from="computed_control_actions" to="/cmd_vel"/>
     </node>
 
-    <node pkg="ugv_trajectory_tracking" type="gvr_bot_commander.py" name="gvr_bot_commander" output="screen">
+    <node pkg="ugv_trajectory_tracking" type="ugv_commander.py" name="ugv_commander" output="screen">
       <param name="rate" type="int" value="$(arg controller_rate)" />
       <param name="trajectory_rate" type="int" value="$(arg trajectory_rate)" />
       <param name="sim" type="bool" value="$(arg simulation)" />

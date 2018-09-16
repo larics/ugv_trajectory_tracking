@@ -11,7 +11,7 @@ from tf.transformations import euler_from_quaternion
 from geometry_msgs.msg import Point
 
 
-class gvrBotControl:
+class ugvControl:
     def __init__(self, rate, parameters, sim):
         self.sim = sim;
         self.rate = rate;
@@ -142,9 +142,6 @@ class gvrBotControl:
     def getStartFlag(self):
         return self.startFlag
 
-    def get_name(self):
-        return str("gvrBotTrajectory")
-
     def controlTypeCallback(self, msg):
         if (self.control_type == 0 and (msg.data == 1 or msg.data == 2)):
             self.position_reference.position.x = self.current_pose.position.x
@@ -161,7 +158,7 @@ class gvrBotControl:
 
 
 if __name__ == '__main__':
-    rospy.init_node('gvr_bot_control')
+    rospy.init_node('ugv_control')
 
     controller_parameters = {'Kp_v': 0.9, 'Kp_w': 1.0, 'v_deadzone': 0.001, 'w_deadzone': 0.0, \
                              'v_limit': 0.0, 'w_limit': 0.0}
@@ -176,29 +173,29 @@ if __name__ == '__main__':
 
     rospyRate = rospy.Rate(rate)
 
-    gvr_bot_control = gvrBotControl(rate, controller_parameters, SIMULATION)
+    ugv_control = ugvControl(rate, controller_parameters, SIMULATION)
 
     if SIMULATION:
-        poseSub = rospy.Subscriber('gazebo/model_states', ModelStates, gvr_bot_control.poseCallback)
+        poseSub = rospy.Subscriber('gazebo/model_states', ModelStates, ugv_control.poseCallback)
     else:
-        poseSub = rospy.Subscriber('pose', PoseStamped, gvr_bot_control.poseCallback)
+        poseSub = rospy.Subscriber('pose', PoseStamped, ugv_control.poseCallback)
    
-    referenceSub = rospy.Subscriber('reference', MultiDOFJointTrajectory, gvr_bot_control.refCallback)
-    cmdVelRefSub = rospy.Subscriber('cmd_vel_ref', Twist, gvr_bot_control.cmdVelRefCallback)
-    controlTypeSub = rospy.Subscriber('control_type', Int16, gvr_bot_control.controlTypeCallback)
+    referenceSub = rospy.Subscriber('reference', MultiDOFJointTrajectory, ugv_control.refCallback)
+    cmdVelRefSub = rospy.Subscriber('cmd_vel_ref', Twist, ugv_control.cmdVelRefCallback)
+    controlTypeSub = rospy.Subscriber('control_type', Int16, ugv_control.controlTypeCallback)
     commandPub = rospy.Publisher('computed_control_actions', Twist, queue_size=1)
 
     command = None
 
-    while not gvr_bot_control.getStartFlag() and not rospy.is_shutdown():
+    while not ugv_control.getStartFlag() and not rospy.is_shutdown():
         print('Waiting for pose measurements.')
         rospy.sleep(0.5)
 
-    print("Starting gvr bot control.")
+    print("Starting ugv control.")
 
     while not rospy.is_shutdown():
 
-        command = gvr_bot_control.getCommand()
+        command = ugv_control.getCommand()
         if not SIMULATION:
             command.angular.z = - command.angular.z
 

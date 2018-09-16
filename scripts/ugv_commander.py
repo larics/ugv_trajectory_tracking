@@ -10,7 +10,7 @@ from std_msgs.msg import Int16
 from trajectory_msgs.msg import MultiDOFJointTrajectory
 from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint
 
-class gvrBotCommander:
+class ugvCommander:
 	def __init__(self, carrot_v, carrot_w, sim, rate, trajectory_rate):
 		self.sim = sim
 		self.rate = rate
@@ -195,7 +195,7 @@ class gvrBotCommander:
 
 
 if __name__ == '__main__':
-	rospy.init_node('gvr_bot_commander')
+	rospy.init_node('ugv_commander')
 
 	rate = rospy.get_param('~rate', int(50))
 	trajectory_sampling_rate = rospy.get_param('~trajectory_rate', int(100))
@@ -203,7 +203,7 @@ if __name__ == '__main__':
 	carrot_v = rospy.get_param('~carrot_v', float(0.05))
 	SIMULATION = rospy.get_param('~sim', bool(False))
 
-	commander = gvrBotCommander(carrot_v, carrot_w, SIMULATION, rate, trajectory_sampling_rate)
+	commander = ugvCommander(carrot_v, carrot_w, SIMULATION, rate, trajectory_sampling_rate)
 	controller_mode = Int16()
 
 	if SIMULATION:
@@ -225,7 +225,7 @@ if __name__ == '__main__':
 		print('Waiting for pose measurements.')
 		rospy.sleep(0.5)
 
-	print('starting gvr commander.')
+	print('starting ugv commander.')
 
 	while not rospy.is_shutdown():
 		if (commander.getMode() == 0):
