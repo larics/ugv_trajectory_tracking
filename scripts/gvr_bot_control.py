@@ -2,7 +2,7 @@
 
 import rospy
 from gazebo_msgs.msg import ModelStates
-from geometry_msgs.msg import Twist, PoseStamped
+from geometry_msgs.msg import Twist, PoseStamped, Pose
 from std_msgs.msg import Int16
 import math
 
@@ -17,7 +17,7 @@ class gvrBotControl:
         self.rate = rate;
         self.command = Twist()
         self.twist_ref = Twist()
-        self.position_reference = Point()
+        self.position_reference = Pose()
         self.startFlag = False
         self.control_type = 0
 
@@ -30,15 +30,19 @@ class gvrBotControl:
     def poseCallback(self, msg):
         if (self.sim):
             if not self.startFlag:
-                self.position_reference.x = msg.pose[-1].position.x
-                self.position_reference.y = msg.pose[-1].position.y
+                self.position_reference.position.x = msg.pose[-1].position.x
+                self.position_reference.position.y = msg.pose[-1].position.y
                 self.startFlag = True
 
             self.current_pose = msg.pose[-1]
         else:
             if not self.startFlag:
-                self.position_reference.x = msg.pose.position.x
-                self.position_reference.y = msg.pose.position.y
+                self.position_reference.position.x = msg.pose.position.x
+                self.position_reference.position.y = msg.pose.position.y
+                self.position_reference.orientation.x = msg.pose.orientation.x
+                self.position_reference.orientation.y = msg.pose.orientation.y
+                self.position_reference.orientation.z = msg.pose.orientation.z
+                self.position_reference.orientation.w = msg.pose.orientation.w
                 self.startFlag = True
 
             self.current_pose = msg.pose
@@ -46,8 +50,12 @@ class gvrBotControl:
     def refCallback(self, msg):
         if len(msg.points) >= 1:
             if len(msg.points[0].transforms) >= 1:
-                self.position_reference.x = msg.points[0].transforms[0].translation.x
-                self.position_reference.y = msg.points[0].transforms[0].translation.y
+                self.position_reference.position.x = msg.points[0].transforms[0].translation.x
+                self.position_reference.position.y = msg.points[0].transforms[0].translation.y
+                self.position_reference.orientation.x = msg.points[0].transforms[0].rotation.x
+                self.position_reference.orientation.y = msg.points[0].transforms[0].rotation.y
+                self.position_reference.orientation.z = msg.points[0].transforms[0].rotation.z
+                self.position_reference.orientation.w = msg.points[0].transforms[0].rotation.w
         else:
             print("Warning! Check the trajectory msg!")
  
@@ -55,8 +63,12 @@ class gvrBotControl:
         feed_forward = Twist()
 
         if (self.control_type == 0):
-            self.position_reference.x = self.current_pose.position.x
-            self.position_reference.y = self.current_pose.position.y
+            self.position_reference.position.x = self.current_pose.position.x
+            self.position_reference.position.y = self.current_pose.position.y
+            self.position_reference.orientation.x = self.current_pose.orientation.x
+            self.position_reference.orientation.y = self.current_pose.orientation.y
+            self.position_reference.orientation.z = self.current_pose.orientation.z
+            self.position_reference.orientation.w = self.current_pose.orientation.w
             feed_forward = self.twist_ref
 
         #self.controller.compute_control_actions(self.current_pose, self.current_twist, self.i)
@@ -68,18 +80,30 @@ class gvrBotControl:
         return self.command
 
     def compute_control_actions(self, pose, reference):
-        quaternion = (
+        quaternion_meas = (
             pose.orientation.x,
             pose.orientation.y,
             pose.orientation.z,
             pose.orientation.w
             )
-        theta_measured = euler_from_quaternion(quaternion)[2]
 
-        dx = reference.x - pose.position.x
-        dy = reference.y - pose.position.y
+        quaternion_ref = (
+            reference.orientation.x,
+            reference.orientation.y,
+            reference.orientation.z,
+            reference.orientation.w
+            )
+
+        theta_measured = euler_from_quaternion(quaternion_meas)[2]
+
+        dx = reference.position.x - pose.position.x
+        dy = reference.position.y - pose.position.y
         d = math.sqrt(dx ** 2 + dy ** 2);
-        theta_ref = math.atan2(dy, dx)
+        if (self.control_type == 2):
+            theta_ref = euler_from_quaternion(quaternion_ref)[2]
+        else:
+            theta_ref = math.atan2(dy, dx)
+
         e_theta = theta_ref - theta_measured;
 
         e_theta = math.atan2(math.sin(e_theta), math.cos(e_theta))
@@ -122,9 +146,13 @@ class gvrBotControl:
         return str("gvrBotTrajectory")
 
     def controlTypeCallback(self, msg):
-        if (self.control_type == 0 and msg.data == 1):
-            self.position_reference.x = self.current_pose.position.x
-            self.position_reference.y = self.current_pose.position.y
+        if (self.control_type == 0 and (msg.data == 1 or msg.data == 2)):
+            self.position_reference.position.x = self.current_pose.position.x
+            self.position_reference.position.y = self.current_pose.position.y
+            self.position_reference.orientation.x = self.current_pose.orientation.x
+            self.position_reference.orientation.y = self.current_pose.orientation.y
+            self.position_reference.orientation.z = self.current_pose.orientation.z
+            self.position_reference.orientation.w = self.current_pose.orientation.w
 
         self.control_type = msg.data
 

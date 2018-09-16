@@ -53,6 +53,10 @@ class gvrBotCommander:
 			print("Entering TRAJECTORY mode.")
 			self.current_pose_reference.position.x = self.current_pose.position.x
 			self.current_pose_reference.position.y = self.current_pose.position.y
+			self.current_pose_reference.orientation.x = self.current_pose.orientation.x
+			self.current_pose_reference.orientation.y = self.current_pose.orientation.y
+			self.current_pose_reference.orientation.z = self.current_pose.orientation.z
+			self.current_pose_reference.orientation.w = self.current_pose.orientation.w
 			self.trajectory_reference = MultiDOFJointTrajectory()
 		elif (self.commander_mode == 3):
 			print("Entering POINT mode.")
@@ -91,7 +95,9 @@ class gvrBotCommander:
 	def getControllerMode(self):
 		if (self.getMode() == 0):
 			return 0
-		elif (self.getMode() == 1 or self.getMode() == 2 or self.getMode() == 3):
+		elif (self.getMode() == 1 or self.getMode() == 2):
+			return 1
+		elif (self.getMode() == 3):
 			return 1
 
 	def getCommandTwist(self):
@@ -141,12 +147,20 @@ class gvrBotCommander:
 			if (self.trajectory_index < self.trajectory_length):
 				self.current_pose_reference.position.x = self.trajectory_reference.points[self.trajectory_index].transforms[0].translation.x
 				self.current_pose_reference.position.y = self.trajectory_reference.points[self.trajectory_index].transforms[0].translation.y
+				self.current_pose_reference.orientation.x = self.trajectory_reference.points[self.trajectory_index].transforms[0].rotation.x
+				self.current_pose_reference.orientation.y = self.trajectory_reference.points[self.trajectory_index].transforms[0].rotation.y
+				self.current_pose_reference.orientation.z = self.trajectory_reference.points[self.trajectory_index].transforms[0].rotation.z
+				self.current_pose_reference.orientation.w = self.trajectory_reference.points[self.trajectory_index].transforms[0].rotation.w
 				self.trajectory_index += int(self.trajectory_rate/self.rate)
 			else:
 				self.new_trajectory = False
 			
 		command.points[0].transforms[0].translation.x = self.current_pose_reference.position.x
 		command.points[0].transforms[0].translation.y = self.current_pose_reference.position.y
+		command.points[0].transforms[0].rotation.x = self.current_pose_reference.orientation.x
+		command.points[0].transforms[0].rotation.y = self.current_pose_reference.orientation.y
+		command.points[0].transforms[0].rotation.z = self.current_pose_reference.orientation.z
+		command.points[0].transforms[0].rotation.w = self.current_pose_reference.orientation.w
 
 		return command
 
