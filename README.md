@@ -1,6 +1,6 @@
 # UGV trajectory tracking
 
-This repository contains code for position control of an UGV. 
+Position control and trajectory tracking algorithm for an UGV.
 
 ## Instalation
 
