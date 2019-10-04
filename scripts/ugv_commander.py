@@ -85,11 +85,11 @@ class ugvCommander:
 			self.setMode(3)
 
 		if (self.getMode() == 0):
-			self.v = msg.axes[4]
+			self.v = msg.axes[3]
 			self.w = msg.axes[0]
 		elif (self.getMode() == 1):
 			self.new_carrot_value = True
-			self.carrot_x = self.carrot_v * msg.axes[4]
+			self.carrot_x = self.carrot_v * msg.axes[3]
 			self.carrot_y = self.carrot_v * msg.axes[0]
 			
 	def getControllerMode(self):

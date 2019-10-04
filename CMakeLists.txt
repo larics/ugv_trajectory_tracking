@@ -12,8 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-  INCLUDE_DIRS include launch scripts
+  INCLUDE_DIRS launch scripts
   LIBRARIES ugv_trajectory_tracking
   CATKIN_DEPENDS rospy std_msgs
-  DEPENDS system_lib
+  DEPENDS 
 )

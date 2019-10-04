@@ -30,11 +30,12 @@ class ugvControl:
     def poseCallback(self, msg):
         if (self.sim):
             if not self.startFlag:
-                self.position_reference.position.x = msg.pose[-1].position.x
-                self.position_reference.position.y = msg.pose[-1].position.y
+                self.position_reference.position.x = msg.pose[1].position.x
+                self.position_reference.position.y = msg.pose[1].position.y
                 self.startFlag = True
 
-            self.current_pose = msg.pose[-1]
+            self.current_pose = msg.pose[1]
+
         else:
             if not self.startFlag:
                 self.position_reference.position.x = msg.pose.position.x
