@@ -26,17 +26,25 @@ class ugvControl:
         self.sensitivity = parameters['sensitivity']
         self.v_limit = parameters["v_limit"]
         self.w_limit = parameters["w_limit"]
+        self.robot_name = parameters['robot_name']
 
         print('Controller initialized with params: ', parameters)
 
     def poseCallback(self, msg):
         if (self.sim):
+            index = -1
+            for i in range(len(msg.name)):
+                if msg.name[i] == self.robot_name:
+                    index = i
+            if index == -1:
+                print("No such robot in Gazebo, cannot get model state.")
+
             if not self.startFlag:
-                self.position_reference.position.x = msg.pose[1].position.x
-                self.position_reference.position.y = msg.pose[1].position.y
+                self.position_reference.position.x = msg.pose[index].position.x
+                self.position_reference.position.y = msg.pose[index].position.y
                 self.startFlag = True
 
-            self.current_pose = msg.pose[1]
+            self.current_pose = msg.pose[index]
 
         else:
             if not self.startFlag:
@@ -174,6 +182,7 @@ if __name__ == '__main__':
     controller_parameters['w_limit'] = rospy.get_param('~w_limit', 0.1)
     controller_parameters['sensitivity'] = rospy.get_param('~sensitivity', 0.001)
     controller_parameters['initial_control_type'] = rospy.get_param('~initial_control_type', 0)
+    controller_parameters['robot_name'] = rospy.get_param('~robot_name', "/")
 
     rospyRate = rospy.Rate(rate)
 

@@ -21,6 +21,7 @@
       <param name="w_limit" type="double" value="2.5" />
       <param name="sensitivity" type="double" value="0.05" />
       <param name="initial_control_type" type="int" value="0" />
+      <param name="robot_name" type="string" value="/" />
 
       <remap from="pose" to="/vrpn_client_node/gvrbot/pose"/>
       <remap from="gazebo/model_states" to="/gazebo/model_states"/>
