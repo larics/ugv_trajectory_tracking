@@ -19,13 +19,15 @@ class ugvControl:
         self.twist_ref = Twist()
         self.position_reference = Pose()
         self.startFlag = False
-        self.control_type = 0
-
+        
+        self.control_type = parameters['initial_control_type']
         self.Kp_v = parameters['Kp_v']
         self.Kp_w = parameters['Kp_w']
         self.sensitivity = parameters['sensitivity']
         self.v_limit = parameters["v_limit"]
         self.w_limit = parameters["w_limit"]
+
+        print('Controller initialized with params: ', parameters)
 
     def poseCallback(self, msg):
         if (self.sim):
@@ -171,6 +173,7 @@ if __name__ == '__main__':
     controller_parameters['v_limit'] = rospy.get_param('~v_limit', 0.1)
     controller_parameters['w_limit'] = rospy.get_param('~w_limit', 0.1)
     controller_parameters['sensitivity'] = rospy.get_param('~sensitivity', 0.001)
+    controller_parameters['initial_control_type'] = rospy.get_param('~initial_control_type', 0)
 
     rospyRate = rospy.Rate(rate)
 
@@ -184,6 +187,9 @@ if __name__ == '__main__':
     referenceSub = rospy.Subscriber('reference', MultiDOFJointTrajectory, ugv_control.refCallback)
     cmdVelRefSub = rospy.Subscriber('cmd_vel_ref', Twist, ugv_control.cmdVelRefCallback)
     controlTypeSub = rospy.Subscriber('control_type', Int16, ugv_control.controlTypeCallback)
+    # control_type = 0 -> cmd vel passthrough
+    # control_type = 1 -> this node computes orientation
+    # control_type = 2 -> orientation is taken from the provided trajectory ref
     commandPub = rospy.Publisher('computed_control_actions', Twist, queue_size=1)
 
     command = None
