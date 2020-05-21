@@ -20,7 +20,7 @@
       <param name="v_limit" type="double" value="0.5" />
       <param name="w_limit" type="double" value="2.5" />
       <param name="sensitivity" type="double" value="0.05" />
-      <param name="initial_control_type" type="int" value="0" />
+      <param name="initial_control_type" type="int" value="1" />
       <param name="robot_name" type="string" value="/" />
 
       <remap from="pose" to="/vrpn_client_node/gvrbot/pose"/>
@@ -28,7 +28,7 @@
       <remap from="computed_control_actions" to="/erl_husky/cmd_vel"/>
     </node>
 
-    <node pkg="ugv_trajectory_tracking" type="ugv_commander.py" name="ugv_commander" output="screen">
+    <!--node pkg="ugv_trajectory_tracking" type="ugv_commander.py" name="ugv_commander" output="screen">
       <param name="rate" type="int" value="$(arg controller_rate)" />
       <param name="trajectory_rate" type="int" value="$(arg trajectory_rate)" />
       <param name="sim" type="bool" value="$(arg simulation)" />
@@ -38,7 +38,7 @@
       <remap from="gazebo/model_states" to="/gazebo/model_states"/>
       <remap from="pose" to="/vrpn_client_node/gvrbot/pose"/>
       <remap from="joy" to="/joy"/>
-    </node>
+    </node-->
   </group>
 
 </launch>
